@@ -24,7 +24,7 @@ public class PlayingState extends BasicGameState {
     private final TerrainFactory terrainFactory;
     private final Shroud shroud;
     private final Input input;
-    private final Vector2D<Integer> screenResolution;
+    private final Vector2D screenResolution;
 
     private final int tileWidth;
     private final int tileHeight;
