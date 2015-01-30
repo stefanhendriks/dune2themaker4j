@@ -47,7 +47,7 @@ public class PlayingState extends BasicGameState {
         this.graphics = gameContainer.getGraphics();
         this.input = gameContainer.getInput();
         this.screenResolution = new Vector2D(gameContainer.getWidth(), gameContainer.getHeight());
-        this.particleSystem = new ParticleSystem("particle_2.png");
+        this.particleSystem = new ParticleSystem("particle_2.png", 1000);
         particleSystem.addEmitter(new FireEmitter(100, 100));
     }
 
