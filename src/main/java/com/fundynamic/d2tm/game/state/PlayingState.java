@@ -11,6 +11,8 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.particles.ParticleSystem;
+import org.newdawn.slick.particles.effects.FireEmitter;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -21,16 +23,19 @@ public class PlayingState extends BasicGameState {
 
     public static int ID = 0;
 
-    private final TerrainFactory terrainFactory;
     private final Shroud shroud;
+    private final Graphics graphics;
     private final Input input;
-    private final Vector2D<Integer> screenResolution;
+
+    private final TerrainFactory terrainFactory;
+    private final Vector2D screenResolution;
+
+    private final ParticleSystem particleSystem;
 
     private final int tileWidth;
     private final int tileHeight;
 
     private Map map;
-    private Graphics graphics;
 
     private List<Viewport> viewports = new ArrayList<>();
 
@@ -41,7 +46,9 @@ public class PlayingState extends BasicGameState {
         this.tileHeight = tileHeight;
         this.graphics = gameContainer.getGraphics();
         this.input = gameContainer.getInput();
-        this.screenResolution = new Vector2D<>(gameContainer.getWidth(), gameContainer.getHeight());
+        this.screenResolution = new Vector2D(gameContainer.getWidth(), gameContainer.getHeight());
+        this.particleSystem = new ParticleSystem("particle_2.png", 1000);
+        particleSystem.addEmitter(new FireEmitter(100, 100));
     }
 
     @Override
@@ -58,7 +65,7 @@ public class PlayingState extends BasicGameState {
         try {
             float moveSpeed = 16.0F;
             Vector2D viewportDrawingPosition = Vector2D.zero();
-            Viewport viewport = new Viewport(screenResolution, viewportDrawingPosition, Vector2D.zero(), graphics, this.map, moveSpeed, tileWidth, tileHeight);
+            Viewport viewport = new Viewport(screenResolution, viewportDrawingPosition, Vector2D.zero(), graphics, this.map, moveSpeed);
 
             // Add listener for this viewport
             input.addMouseListener(new ViewportMovementListener(viewport, screenResolution));
@@ -74,6 +81,7 @@ public class PlayingState extends BasicGameState {
         for (Viewport viewport : viewports) {
             viewport.render();
         }
+        particleSystem.render();
     }
 
     @Override
@@ -81,5 +89,6 @@ public class PlayingState extends BasicGameState {
         for (Viewport viewport : viewports) {
             viewport.update();
         }
+        particleSystem.update(delta);
     }
 }
