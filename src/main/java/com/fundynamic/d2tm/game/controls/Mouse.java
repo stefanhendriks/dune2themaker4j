@@ -228,9 +228,9 @@ public class Mouse {
                 // set mouse behaviour + remember the old one, so when we lose focus we get back to the old
                 // behavior?
                 // also cache the behaviors!?
-                System.out.println("mouse is on a GUI thing!");
+//                System.out.println("mouse is on a GUI thing!");
             } else {
-                System.out.println("mouse is on a CELL thing!");
+//                System.out.println("mouse is on a CELL thing!");
                 com.fundynamic.d2tm.game.map.Map map = viewport.getMap();
                 Coordinate absoluteMapCoordinates = viewport.translateViewportCoordinateToAbsoluteMapCoordinate(viewportPosition);
                 mouseMovedToCell(map.getCellByAbsoluteMapCoordinates(absoluteMapCoordinates));
