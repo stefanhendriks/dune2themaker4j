@@ -55,7 +55,7 @@ public class BuyStuffGuiElement {
         int widthOfWindow =  1 + (4 * widthOfIcon) + 3 + 1; // 1 pixel left border + 4 icons + 3 times in between a pixel + 1 pixel for border at the right
 
         rectangle = new Rectangle(x, y, x + widthOfWindow, y + heightOfWindow);
-        System.out.println("The guy window dimensions are: " + rectangle);
+        System.out.println("The gui window dimensions are: " + rectangle);
     }
 
     public int getX() {
