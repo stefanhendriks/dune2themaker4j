@@ -11,12 +11,12 @@ import org.newdawn.slick.SpriteSheet;
 
 /**
  * A spritesheet, which contains images that represent several 'facings' of a unit. Ie the body or
- * barrel of a unit.
+ * barrel/gun of a unit.
  *
  * This object contains state, so it has current facing, a desired facing, a think method that enables 'rotating towards'
  * the desired facing and so on.
  *
- * It also can be rendered
+ * It also can be rendered.
  */
 public class RenderableWithFacingLogic extends SpriteSheet implements Renderable, Updateable {
 
@@ -62,10 +62,6 @@ public class RenderableWithFacingLogic extends SpriteSheet implements Renderable
 
     public boolean isFacingDesiredFacing() {
         return desiredFacing == (int) facing;
-    }
-
-    public boolean isFacing(int desiredFacing) {
-        return (int) this.facing == desiredFacing;
     }
 
     @Override

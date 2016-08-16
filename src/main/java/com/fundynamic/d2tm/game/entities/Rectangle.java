@@ -6,7 +6,7 @@ public class Rectangle {
 
     private float width;
     private float height;
-    private Vector2D topLeft;
+    protected Vector2D topLeft;
     private Vector2D bottomRight;
 
     public static Rectangle create(Vector2D absTopLeftInPixels, Vector2D absBottomRightInPixels) {

@@ -8,7 +8,7 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 /**
- * Null object for renderable with facing logic. So we don't need to put if statements everywhere with null checks *
+ * Null object for renderable with facing logic. So we don't need to put if statements everywhere with null checks
  */
 public class NullRenderableWithFacingLogic extends RenderableWithFacingLogic {
 
