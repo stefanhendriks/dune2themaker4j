@@ -37,4 +37,12 @@ public class ImageRepository {
         return new Image(dimensions.getXAsInt(), dimensions.getYAsInt());
     }
 
+    private static ImageRepository instance;
+
+    public static ImageRepository getInstance() {
+        if (instance == null) {
+            instance = new ImageRepository();
+        }
+        return instance;
+    }
 }

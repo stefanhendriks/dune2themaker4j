@@ -29,7 +29,7 @@ public class Game extends StateBasedGame {
 
     @Override
     public void initStatesList(GameContainer container) throws SlickException {
-        ImageRepository imageRepository = new ImageRepository();
+        ImageRepository imageRepository = ImageRepository.getInstance();
         DuneTerrainFactory terrainFactory = new DuneTerrainFactory(
                 new Theme(
                         imageRepository.loadAndCache("sheet_terrain.png"),
