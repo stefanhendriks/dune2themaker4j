@@ -1,6 +1,5 @@
 package com.fundynamic.d2tm.game.state;
 
-import com.fundynamic.d2tm.Game;
 import com.fundynamic.d2tm.game.controls.Mouse;
 import com.fundynamic.d2tm.game.entities.*;
 import com.fundynamic.d2tm.game.event.DebugKeysListener;
@@ -74,15 +73,13 @@ public class PlayingState extends BasicGameState {
 
         try {
             float moveSpeed = 30 * tileSize;
-            Vector2D viewingVector = Vector2D.create(32, 32);
+            Vector2D viewingVector = Vector2D.create(32, 32); // the camera position (TODO: renaming?)
 //            Vector2D half = screenResolution.min(Vector2D.create(Game.SCREEN_WIDTH / 2, 0));
 
             int guiThingyHeight = 100;
             Vector2D viewportResolution = getResolution().min(Vector2D.create(0, guiThingyHeight));
 
             Vector2D viewportDrawingPosition = Vector2D.zero();
-
-            viewportDrawingPosition = viewportDrawingPosition.add(Vector2D.create(0, guiThingyHeight));
 
             Viewport viewport = new Viewport(
                     viewportResolution,
@@ -144,17 +141,6 @@ public class PlayingState extends BasicGameState {
         for (Viewport viewport : viewports) {
             viewport.render(graphics);
         }
-
-        Entity lastSelectedEntity = viewports.get(0).getMouse().getLastSelectedEntity();
-        if (lastSelectedEntity != null && lastSelectedEntity.getEntityType().equals(EntityType.STRUCTURE)) {
-            graphics.setColor(Color.white);
-            int y = 16;
-            int maxWidth = Game.SCREEN_WIDTH;
-            for (int x = 16; x < maxWidth; x += 64) {
-                graphics.drawRect(x, y, x + 48, y + 48);
-            }
-        }
-
 
         Font font = graphics.getFont();
 

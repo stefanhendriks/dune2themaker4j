@@ -3,9 +3,11 @@ package com.fundynamic.d2tm.game.rendering;
 import com.fundynamic.d2tm.Game;
 import com.fundynamic.d2tm.game.behaviors.Renderable;
 import com.fundynamic.d2tm.game.controls.Mouse;
+import com.fundynamic.d2tm.game.entities.Entity;
 import com.fundynamic.d2tm.game.entities.EntityRepository;
 import com.fundynamic.d2tm.game.entities.Player;
 import com.fundynamic.d2tm.game.entities.Rectangle;
+import com.fundynamic.d2tm.game.gui.BuyStuffGuiElement;
 import com.fundynamic.d2tm.game.map.Map;
 import com.fundynamic.d2tm.game.map.Perimeter;
 import com.fundynamic.d2tm.math.Coordinate;
@@ -41,6 +43,7 @@ public class Viewport implements Renderable {
     private final Mouse mouse;
 
     private Map map;
+    private BuyStuffGuiElement buyStuffGuiElement;
 
     public Viewport(Map map, Mouse mouse, Player player, Image buffer) throws SlickException {
         this(Game.getResolution(),
@@ -107,8 +110,12 @@ public class Viewport implements Renderable {
 
             cellViewportRenderer.render(buffer, viewingVector, cellShroudRenderer);
 
-            // TODO make mouse implement Renderable interface?
+            // TODO: make mouse implement Renderable interface?
             mouse.render(this.buffer.getGraphics());
+
+            if (buyStuffGuiElement != null) {
+                buyStuffGuiElement.draw(buffer.getGraphics());
+            }
 
             if (drawDebugInfo) {
                 cellViewportRenderer.render(this.buffer, viewingVector, cellDebugInfoRenderer);
@@ -129,6 +136,7 @@ public class Viewport implements Renderable {
         Rectangle rectangle = Rectangle.createWithDimensions(viewingVector.min(Vector2D.create(32, 32)), viewportDimensions.add(Vector2D.create(64, 64)));
 
         RenderQueue renderQueue = new RenderQueue(this.viewingVector);
+        // This is an expensive operation!
         renderQueue.put(entityRepository.findEntitiesWithinRectangle(rectangle).toList());
 
         return renderQueue;
@@ -137,6 +145,23 @@ public class Viewport implements Renderable {
     public void update(float delta) {
         Vector2D translation = velocity.scale(delta);
         viewingVector = viewingVectorPerimeter.makeSureVectorStaysWithin(viewingVector.add(translation));
+
+        Entity lastSelectedEntity = mouse.getLastSelectedEntityNeverNull();
+        if (buyStuffGuiElement == null && lastSelectedEntity.isSelectedSelectable()) {
+
+            if (lastSelectedEntity.isStructure()) {
+                // TODO: Make window pop-up next to structure!
+//                Coordinate coordinate = lastSelectedEntity;
+
+                Vector2D position = mouse.getPosition();
+                buyStuffGuiElement = new BuyStuffGuiElement(position.getXAsInt() + 16, position.getYAsInt() - 16);
+            }
+        } else {
+            // when last selected entity is no longer selected, just forget about the gui
+            if (!lastSelectedEntity.isSelectedSelectable()) {
+                this.buyStuffGuiElement = null;
+            }
+        }
     }
 
     private void moveLeft() {
@@ -215,6 +240,15 @@ public class Viewport implements Renderable {
         Rectangle rect = Rectangle.createWithDimensions(drawingVector, viewportDimensions);
         if (!rect.isVectorWithin(screenPosition)) return null; // outside our viewport!
         return new Coordinate(screenPosition.min(drawingVector));
+    }
+
+    public BuyStuffGuiElement isWithinBuyStuffGuyElement(Vector2D screenPosition) {
+        if (buyStuffGuiElement != null) {
+            if (buyStuffGuiElement.isVectorWithin(screenPosition)) {
+                return buyStuffGuiElement;
+            }
+        }
+        return null;
     }
 
     public Mouse getMouse() {

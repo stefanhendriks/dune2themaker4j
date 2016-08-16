@@ -1,6 +1,7 @@
 package com.fundynamic.d2tm.game.controls;
 
 import com.fundynamic.d2tm.game.entities.*;
+import com.fundynamic.d2tm.game.gui.BuyStuffGuiElement;
 import com.fundynamic.d2tm.game.map.Cell;
 import com.fundynamic.d2tm.game.rendering.Viewport;
 import com.fundynamic.d2tm.graphics.ImageRepository;
@@ -24,6 +25,8 @@ public class Mouse {
     private final Player controllingPlayer;
     private final GameContainer gameContainer;
     private final EntityRepository entityRepository;
+
+    private Vector2D position = Vector2D.zero();
 
     private Viewport viewport;
 
@@ -84,9 +87,13 @@ public class Mouse {
 
     public Entity hoveringOverSelectableEntity() {
         if (hoverCell == null) return NullEntity.INSTANCE;
-        EntitiesSet entities = entityRepository.filter(Predicate.builder().
-                vectorWithin(hoverCell.getCoordinates()).
-                isSelectable());
+
+        EntitiesSet entities = entityRepository.filter(
+                    Predicate.builder().
+                        vectorWithin(hoverCell.getCoordinates()).
+                        isSelectable()
+        );
+
         Entity entity = entities.getFirst();
         if (entity == null) return NullEntity.INSTANCE;
         if (!entity.isSelectable()) return NullEntity.INSTANCE;
@@ -107,6 +114,10 @@ public class Mouse {
 
     public Entity getLastSelectedEntity() {
         return lastSelectedEntity;
+    }
+
+    public Entity getLastSelectedEntityNeverNull() {
+        return lastSelectedEntity != null ? lastSelectedEntity : NullEntity.INSTANCE;
     }
 
     public void setLastSelectedEntity(Entity lastSelectedEntity) {
@@ -206,17 +217,30 @@ public class Mouse {
     }
 
     public void movedTo(Vector2D screenPosition) {
+        this.position = screenPosition;
         // TODO: this method should deal with viewport dimensions instead of window dimensions
         viewport.tellAboutNewMousePositions(screenPosition.getXAsInt(), screenPosition.getYAsInt());
 
         Vector2D viewportPosition = viewport.translateScreenToViewportCoordinate(screenPosition);
         if (viewportPosition != null) {
-            com.fundynamic.d2tm.game.map.Map map = viewport.getMap();
-            Coordinate absoluteMapCoordinates = viewport.translateViewportCoordinateToAbsoluteMapCoordinate(viewportPosition);
-            mouseMovedToCell(map.getCellByAbsoluteMapCoordinates(absoluteMapCoordinates));
+            BuyStuffGuiElement buyStuffGuiElement = viewport.isWithinBuyStuffGuyElement(screenPosition);
+            if (buyStuffGuiElement != null) {
+                // set mouse behaviour + remember the old one, so when we lose focus we get back to the old
+                // behavior?
+                // also cache the behaviors!?
+                System.out.println("mouse is on a GUI thing!");
+            } else {
+                System.out.println("mouse is on a CELL thing!");
+                com.fundynamic.d2tm.game.map.Map map = viewport.getMap();
+                Coordinate absoluteMapCoordinates = viewport.translateViewportCoordinateToAbsoluteMapCoordinate(viewportPosition);
+                mouseMovedToCell(map.getCellByAbsoluteMapCoordinates(absoluteMapCoordinates));
+            }
         } else {
 //            System.out.println("Lost focus!");
         }
     }
 
+    public Vector2D getPosition() {
+        return position;
+    }
 }
