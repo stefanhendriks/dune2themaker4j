@@ -6,7 +6,7 @@ public class Rectangle {
 
     private float width;
     private float height;
-    protected Vector2D topLeft;
+    private Vector2D topLeft;
     private Vector2D bottomRight;
 
     public static Rectangle create(Vector2D absTopLeftInPixels, Vector2D absBottomRightInPixels) {
@@ -46,5 +46,13 @@ public class Rectangle {
                 ", topLeft=" + topLeft +
                 ", bottomRight=" + bottomRight +
                 '}';
+    }
+
+    public Vector2D getTopLeft() {
+        return topLeft;
+    }
+
+    public Vector2D getBottomRight() {
+        return bottomRight;
     }
 }
