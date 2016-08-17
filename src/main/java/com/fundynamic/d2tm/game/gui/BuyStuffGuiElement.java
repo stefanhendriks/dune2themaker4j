@@ -18,9 +18,11 @@ public class BuyStuffGuiElement implements Renderable, Updateable {
 
     private Rectangle rectangle;
 
-    private List<BuyIcon> buyIcons = new ArrayList<>();
+    private BuyIconList buyIconList = new BuyIconList();
+
     private final int widthOfIcon;
     private final int heightOfIcon;
+
     private Mouse mouse;
 
     public BuyStuffGuiElement(int x, int y, Mouse mouse) {
@@ -73,7 +75,7 @@ public class BuyStuffGuiElement implements Renderable, Updateable {
             Image image = images.get(i);
 
             BuyIcon buyIcon = new BuyIcon(imageX, imageY, image);
-            buyIcons.add(buyIcon);
+            buyIconList.add(buyIcon);
             horizontalIconCounter++;
 
             imageX += widthOfIcon;
@@ -140,9 +142,8 @@ public class BuyStuffGuiElement implements Renderable, Updateable {
         graphics.setColor(Color.yellow);
         graphics.drawLine(getX(), getY() + 24, getMostRightXCoordinate(), getY() + 24);
 
-        for (BuyIcon buyIcon : buyIcons) {
-            buyIcon.render(graphics, x, y);
-        }
+        buyIconList.render(graphics, x, y);
+
     }
 
     @Override
@@ -152,6 +153,16 @@ public class BuyStuffGuiElement implements Renderable, Updateable {
 
     @Override
     public void update(float deltaInSeconds) {
+        for (BuyIcon buyIcon : buyIconList) {
+            buyIcon.setMouseHovers(buyIcon.isVectorWithin(mouse.getPosition()));
+        }
+    }
 
+    public void leftClicked() {
+        buyIconList.buildActiveIcon();
+    }
+
+    public void rightClicked() {
+        buyIconList.stopActiveIconBeingBuild();
     }
 }

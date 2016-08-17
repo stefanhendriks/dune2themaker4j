@@ -218,6 +218,7 @@ public class Mouse {
 
     public void movedTo(Vector2D screenPosition) {
         this.position = screenPosition;
+
         // TODO: this method should deal with viewport dimensions instead of window dimensions
         viewport.tellAboutNewMousePositions(screenPosition.getXAsInt(), screenPosition.getYAsInt());
 
@@ -229,7 +230,11 @@ public class Mouse {
                 // behavior?
                 // also cache the behaviors!?
 //                System.out.println("mouse is on a GUI thing!");
+                setMouseBehavior(new GuiMouse(this, buyStuffGuiElement));
             } else {
+                if (this.mouseBehavior instanceof GuiMouse) {
+                    setMouseBehavior(new NormalMouse(this));
+                }
 //                System.out.println("mouse is on a CELL thing!");
                 com.fundynamic.d2tm.game.map.Map map = viewport.getMap();
                 Coordinate absoluteMapCoordinates = viewport.translateViewportCoordinateToAbsoluteMapCoordinate(viewportPosition);
