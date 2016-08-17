@@ -232,6 +232,7 @@ public class Mouse {
 //                System.out.println("mouse is on a GUI thing!");
                 setMouseBehavior(new GuiMouse(this, buyStuffGuiElement));
             } else {
+
                 if (this.mouseBehavior instanceof GuiMouse) {
                     setMouseBehavior(new NormalMouse(this));
                 }

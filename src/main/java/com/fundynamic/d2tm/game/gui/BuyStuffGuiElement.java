@@ -155,6 +155,7 @@ public class BuyStuffGuiElement implements Renderable, Updateable {
     public void update(float deltaInSeconds) {
         for (BuyIcon buyIcon : buyIconList) {
             buyIcon.setMouseHovers(buyIcon.isVectorWithin(mouse.getPosition()));
+            buyIcon.update(deltaInSeconds);
         }
     }
 

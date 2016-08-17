@@ -3,6 +3,7 @@ package com.fundynamic.d2tm.game.gui;
 
 import com.fundynamic.d2tm.game.behaviors.Renderable;
 import com.fundynamic.d2tm.game.behaviors.Updateable;
+import com.fundynamic.d2tm.game.entities.EntityData;
 import com.fundynamic.d2tm.game.entities.Rectangle;
 import com.fundynamic.d2tm.game.rendering.RenderQueue;
 import com.fundynamic.d2tm.math.Vector2D;
@@ -18,12 +19,14 @@ public class BuyIcon implements Renderable, Updateable {
     private Rectangle rectangle;
     private BuyIconState state;
     private boolean mouseHovers;
+    private float buildingProgress;
 
     private Image image;
 
     public BuyIcon(int x, int y, Image image) {
         rectangle = new Rectangle(x, y, x + image.getWidth(), y + image.getHeight());
         this.image = image;
+        buildingProgress = 0f;
     }
 
     public boolean isVectorWithin(Vector2D vec) {
@@ -32,7 +35,15 @@ public class BuyIcon implements Renderable, Updateable {
 
     @Override
     public void update(float deltaInSeconds) {
-
+        if (state == BuyIconState.Building) {
+            // 0.2f (20%) per second
+            buildingProgress += EntityData.getRelativeSpeed(0.2f, deltaInSeconds);
+            if (buildingProgress >= 1.0f) {
+                buildingProgress = 1.0f;
+                // Done building the thing
+                state = BuyIconState.Placeable;
+            }
+        }
     }
 
     @Override
@@ -43,8 +54,23 @@ public class BuyIcon implements Renderable, Updateable {
             // busy building
             graphics.setColor(Color.white);
 
+            String progressString = "" + (int)(buildingProgress * 100) + "%";
+
             // TODO: Create GraphicsHelper? (to deal with our Rectangle class, etc?)
-            graphics.drawString("BLDNG", rectangle.getTopLeftXAsInt(), rectangle.getTopLeftYAsInt());
+            graphics.setColor(Color.black);
+            graphics.drawString(progressString, rectangle.getTopLeftXAsInt() + 1, rectangle.getTopLeftYAsInt() + 1);
+            graphics.setColor(Color.white);
+            graphics.drawString(progressString, rectangle.getTopLeftXAsInt(), rectangle.getTopLeftYAsInt());
+        }
+
+        if (state == BuyIconState.Placeable) {
+            String placeString = "Place it";
+
+            // TODO: Create GraphicsHelper? (to deal with our Rectangle class, etc?)
+            graphics.setColor(Color.black);
+            graphics.drawString(placeString, rectangle.getTopLeftXAsInt() + 1, rectangle.getTopLeftYAsInt() + 1);
+            graphics.setColor(Color.red);
+            graphics.drawString(placeString, rectangle.getTopLeftXAsInt(), rectangle.getTopLeftYAsInt());
         }
 
         if (state == BuyIconState.Disabled) {
@@ -74,7 +100,10 @@ public class BuyIcon implements Renderable, Updateable {
     }
 
     public void build() {
-        this.state = BuyIconState.Building;
+        if (this.state != BuyIconState.Building) {
+            this.state = BuyIconState.Building;
+            buildingProgress = 0f;
+        }
     }
 
     @Override
