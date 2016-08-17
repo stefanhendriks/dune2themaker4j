@@ -1,6 +1,10 @@
 package com.fundynamic.d2tm.game.gui;
 
+import com.fundynamic.d2tm.game.behaviors.Renderable;
+import com.fundynamic.d2tm.game.behaviors.Updateable;
+import com.fundynamic.d2tm.game.controls.Mouse;
 import com.fundynamic.d2tm.game.entities.Rectangle;
+import com.fundynamic.d2tm.game.rendering.RenderQueue;
 import com.fundynamic.d2tm.graphics.ImageRepository;
 import com.fundynamic.d2tm.math.Vector2D;
 import org.newdawn.slick.Color;
@@ -10,17 +14,20 @@ import org.newdawn.slick.Image;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BuyStuffGuiElement {
+public class BuyStuffGuiElement implements Renderable, Updateable {
 
     private Rectangle rectangle;
 
-    private List<Image> images = new ArrayList<>();
+    private List<BuyIcon> buyIcons = new ArrayList<>();
     private final int widthOfIcon;
     private final int heightOfIcon;
+    private Mouse mouse;
 
-    public BuyStuffGuiElement(int x, int y) {
+    public BuyStuffGuiElement(int x, int y, Mouse mouse) {
+        this.mouse = mouse;
         // TODO: Do this properly, because a getInstance is a very ugly way to get this dependency here.
         ImageRepository instance = ImageRepository.getInstance();
+        List<Image> images = new ArrayList<>();
         images.add(instance.loadAndCache("ui/icons/icon_1slab.bmp"));
         images.add(instance.loadAndCache("ui/icons/icon_4slab.bmp"));
         images.add(instance.loadAndCache("ui/icons/icon_barracks.bmp"));
@@ -40,8 +47,6 @@ public class BuyStuffGuiElement {
         images.add(instance.loadAndCache("ui/icons/icon_windtrap.bmp"));
         images.add(instance.loadAndCache("ui/icons/icon_wor.bmp"));
 
-
-
         // 3 icons in a row. We assume the dimensions of the first one
         widthOfIcon = images.get(0).getWidth();
         heightOfIcon = images.get(0).getHeight();
@@ -55,39 +60,9 @@ public class BuyStuffGuiElement {
         int widthOfWindow =  1 + (4 * widthOfIcon) + 3 + 1; // 1 pixel left border + 4 icons + 3 times in between a pixel + 1 pixel for border at the right
 
         rectangle = new Rectangle(x, y, x + widthOfWindow, y + heightOfWindow);
+
         System.out.println("The gui window dimensions are: " + rectangle);
-    }
 
-    public int getX() {
-        return rectangle.getTopLeft().getXAsInt();
-    }
-
-    public int getY() {
-        return rectangle.getTopLeft().getYAsInt();
-    }
-
-    public int getMostRightXCoordinate() {
-        return rectangle.getBottomRight().getXAsInt();
-    }
-
-    public int getMostDownYCoordinate() {
-        return rectangle.getBottomRight().getYAsInt();
-    }
-
-    public void draw(Graphics graphics) {
-        graphics.setColor(Color.black);
-        graphics.fillRect(getX(), getY(), getWidthAsInt(), getHeightAsInt());
-
-        graphics.setColor(Color.darkGray);
-        graphics.drawRect(getX(), getY(), getWidthAsInt(), getHeightAsInt());
-
-        // title
-        graphics.setAntiAlias(false);
-        graphics.setColor(Color.white);
-        graphics.drawString("Construction Yard", getX() + 1, getY() + 2);
-
-        graphics.setColor(Color.yellow);
-        graphics.drawLine(getX(), getY() + 24, getMostRightXCoordinate(), getY() + 24);
 
         // Window content
         int imageX = getX() + 1; // 1 pixel is the border
@@ -97,7 +72,8 @@ public class BuyStuffGuiElement {
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
 
-            graphics.drawImage(image, imageX, imageY);
+            BuyIcon buyIcon = new BuyIcon(imageX, imageY, image);
+            buyIcons.add(buyIcon);
             horizontalIconCounter++;
 
             imageX += widthOfIcon;
@@ -120,6 +96,22 @@ public class BuyStuffGuiElement {
         }
     }
 
+    public int getX() {
+        return rectangle.getTopLeftXAsInt();
+    }
+
+    public int getY() {
+        return rectangle.getTopLeftYAsInt();
+    }
+
+    public int getMostRightXCoordinate() {
+        return rectangle.getBottomRight().getXAsInt();
+    }
+
+    public int getMostDownYCoordinate() {
+        return rectangle.getBottomRight().getYAsInt();
+    }
+
     private int getHeightAsInt() {
         return rectangle.getHeightAsInt();
     }
@@ -130,5 +122,36 @@ public class BuyStuffGuiElement {
 
     public boolean isVectorWithin(Vector2D vec) {
         return rectangle.isVectorWithin(vec);
+    }
+
+    @Override
+    public void render(Graphics graphics, int x, int y) {
+        graphics.setColor(Color.black);
+        graphics.fillRect(getX(), getY(), getWidthAsInt(), getHeightAsInt());
+
+        graphics.setColor(Color.darkGray);
+        graphics.drawRect(getX(), getY(), getWidthAsInt(), getHeightAsInt());
+
+        // title
+        graphics.setAntiAlias(false);
+        graphics.setColor(Color.white);
+        graphics.drawString("Construction Yard", getX() + 1, getY() + 2);
+
+        graphics.setColor(Color.yellow);
+        graphics.drawLine(getX(), getY() + 24, getMostRightXCoordinate(), getY() + 24);
+
+        for (BuyIcon buyIcon : buyIcons) {
+            buyIcon.render(graphics, x, y);
+        }
+    }
+
+    @Override
+    public void enrichRenderQueue(RenderQueue renderQueue) {
+        // nothing to do here
+    }
+
+    @Override
+    public void update(float deltaInSeconds) {
+
     }
 }

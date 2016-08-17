@@ -114,7 +114,7 @@ public class Viewport implements Renderable {
             mouse.render(this.buffer.getGraphics());
 
             if (buyStuffGuiElement != null) {
-                buyStuffGuiElement.draw(buffer.getGraphics());
+                buyStuffGuiElement.render(buffer.getGraphics(), x, y);
             }
 
             if (drawDebugInfo) {
@@ -143,25 +143,32 @@ public class Viewport implements Renderable {
     }
 
     public void update(float delta) {
+
+        // Move around the viewing vector
         Vector2D translation = velocity.scale(delta);
+        // Make sure it won't go out of bounds
         viewingVector = viewingVectorPerimeter.makeSureVectorStaysWithin(viewingVector.add(translation));
 
         Entity lastSelectedEntity = mouse.getLastSelectedEntityNeverNull();
-        if (buyStuffGuiElement == null && lastSelectedEntity.isSelectedSelectable()) {
 
-            if (lastSelectedEntity.isStructure()) {
-                // TODO: Make window pop-up next to structure!
-//                Coordinate coordinate = lastSelectedEntity;
+        // A buy stuff gui element is active
+        if (buyStuffGuiElement != null) {
+            buyStuffGuiElement.update(delta);
 
-                Vector2D position = mouse.getPosition();
-                buyStuffGuiElement = new BuyStuffGuiElement(position.getXAsInt() + 16, position.getYAsInt() - 16);
-            }
-        } else {
             // when last selected entity is no longer selected, just forget about the gui
             if (!lastSelectedEntity.isSelectedSelectable()) {
                 this.buyStuffGuiElement = null;
             }
+        } else {
+            if (lastSelectedEntity.isSelectedSelectable()) {
+               if (lastSelectedEntity.isStructure()) {
+                    // TODO: Make window pop-up next to structure?
+                    Vector2D mousePosition = mouse.getPosition();
+                    buyStuffGuiElement = new BuyStuffGuiElement(mousePosition.getXAsInt() + 16, mousePosition.getYAsInt() - 16, mouse);
+                }
+            }
         }
+
     }
 
     private void moveLeft() {
