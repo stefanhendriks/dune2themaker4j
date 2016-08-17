@@ -47,4 +47,20 @@ public class Rectangle {
                 ", bottomRight=" + bottomRight +
                 '}';
     }
+
+    public Vector2D getTopLeft() {
+        return topLeft;
+    }
+
+    public int getTopLeftXAsInt() {
+        return topLeft.getXAsInt();
+    }
+
+    public int getTopLeftYAsInt() {
+        return topLeft.getYAsInt();
+    }
+
+    public Vector2D getBottomRight() {
+        return bottomRight;
+    }
 }

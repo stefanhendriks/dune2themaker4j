@@ -2,10 +2,13 @@ package com.fundynamic.d2tm.game.rendering;
 
 import com.fundynamic.d2tm.Game;
 import com.fundynamic.d2tm.game.behaviors.Renderable;
+import com.fundynamic.d2tm.game.behaviors.Updateable;
 import com.fundynamic.d2tm.game.controls.Mouse;
+import com.fundynamic.d2tm.game.entities.Entity;
 import com.fundynamic.d2tm.game.entities.EntityRepository;
 import com.fundynamic.d2tm.game.entities.Player;
 import com.fundynamic.d2tm.game.entities.Rectangle;
+import com.fundynamic.d2tm.game.gui.BuyStuffGuiElement;
 import com.fundynamic.d2tm.game.map.Map;
 import com.fundynamic.d2tm.game.map.Perimeter;
 import com.fundynamic.d2tm.math.Coordinate;
@@ -14,7 +17,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-public class Viewport implements Renderable {
+public class Viewport implements Renderable, Updateable {
 
     private static final int PIXELS_NEAR_BORDER = 2;
 
@@ -41,6 +44,7 @@ public class Viewport implements Renderable {
     private final Mouse mouse;
 
     private Map map;
+    private BuyStuffGuiElement buyStuffGuiElement;
 
     public Viewport(Map map, Mouse mouse, Player player, Image buffer) throws SlickException {
         this(Game.getResolution(),
@@ -107,8 +111,12 @@ public class Viewport implements Renderable {
 
             cellViewportRenderer.render(buffer, viewingVector, cellShroudRenderer);
 
-            // TODO make mouse implement Renderable interface?
+            // TODO: make mouse implement Renderable interface?
             mouse.render(this.buffer.getGraphics());
+
+            if (buyStuffGuiElement != null) {
+                buyStuffGuiElement.render(buffer.getGraphics(), x, y);
+            }
 
             if (drawDebugInfo) {
                 cellViewportRenderer.render(this.buffer, viewingVector, cellDebugInfoRenderer);
@@ -129,14 +137,40 @@ public class Viewport implements Renderable {
         Rectangle rectangle = Rectangle.createWithDimensions(viewingVector.min(Vector2D.create(32, 32)), viewportDimensions.add(Vector2D.create(64, 64)));
 
         RenderQueue renderQueue = new RenderQueue(this.viewingVector);
+
+        // This is an expensive operation!
         renderQueue.put(entityRepository.findEntitiesWithinRectangle(rectangle).toList());
 
         return renderQueue;
     }
 
+    @Override
     public void update(float delta) {
+        // Move around the viewing vector
         Vector2D translation = velocity.scale(delta);
+        // Make sure it won't go out of bounds
         viewingVector = viewingVectorPerimeter.makeSureVectorStaysWithin(viewingVector.add(translation));
+
+        Entity lastSelectedEntity = mouse.getLastSelectedEntityNeverNull();
+
+        // A buy stuff gui element is active
+        if (buyStuffGuiElement != null) {
+            buyStuffGuiElement.update(delta);
+
+            // when last selected entity is no longer selected, just forget about the gui
+            if (!lastSelectedEntity.isSelectedSelectable()) {
+                this.buyStuffGuiElement = null;
+            }
+        } else {
+            if (lastSelectedEntity.isSelectedSelectable()) {
+               if (lastSelectedEntity.isStructure()) {
+                    // TODO: Make window pop-up next to structure?
+                    Vector2D mousePosition = mouse.getPosition();
+                    buyStuffGuiElement = new BuyStuffGuiElement(mousePosition.getXAsInt() + 16, mousePosition.getYAsInt() - 16, mouse, mouse.getEntityRepository());
+                }
+            }
+        }
+
     }
 
     private void moveLeft() {
@@ -215,6 +249,15 @@ public class Viewport implements Renderable {
         Rectangle rect = Rectangle.createWithDimensions(drawingVector, viewportDimensions);
         if (!rect.isVectorWithin(screenPosition)) return null; // outside our viewport!
         return new Coordinate(screenPosition.min(drawingVector));
+    }
+
+    public BuyStuffGuiElement isWithinBuyStuffGuiElement(Vector2D screenPosition) {
+        if (buyStuffGuiElement != null) {
+            if (buyStuffGuiElement.isVectorWithin(screenPosition)) {
+                return buyStuffGuiElement;
+            }
+        }
+        return null;
     }
 
     public Mouse getMouse() {

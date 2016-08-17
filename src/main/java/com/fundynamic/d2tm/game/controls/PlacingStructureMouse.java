@@ -16,6 +16,8 @@ public class PlacingStructureMouse extends AbstractMouseBehavior {
 
     public PlacingStructureMouse(Mouse mouse, EntityRepository entityRepository) {
         super(mouse);
+        if (entityRepository == null) throw new IllegalArgumentException("entityRepository");
+
         this.entityRepository = entityRepository;
         selectRandomlySomethingToPlace();
     }

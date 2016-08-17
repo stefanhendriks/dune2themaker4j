@@ -160,4 +160,21 @@ public abstract class Entity implements Renderable, Updateable {
         this.origin = origin;
         return this;
     }
+
+    public boolean isStructure() {
+        return getEntityType().equals(EntityType.STRUCTURE);
+    }
+
+    public boolean isUnit() {
+        return getEntityType().equals(EntityType.UNIT);
+    }
+
+    /**
+     * Returns true if this instance implements {@link Selectable} interface, and if so, it returns
+     * the value of the method {@code isSelectable()}. (ie is it selected?)
+     * @return
+     */
+    public boolean isSelectedSelectable() {
+        return isSelectable() && ((Selectable) this).isSelected();
+    }
 }

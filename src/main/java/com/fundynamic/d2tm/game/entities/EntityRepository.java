@@ -175,6 +175,8 @@ public class EntityRepository {
     /**
      * Slow way of filtering within area!
      *
+     * TODO: Speed up the searching of entities by coordinates (or an area/rect).
+     *
      * @param rectangle
      * @return
      */
