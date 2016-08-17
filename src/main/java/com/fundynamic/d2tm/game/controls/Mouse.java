@@ -230,7 +230,11 @@ public class Mouse {
                 // behavior?
                 // also cache the behaviors!?
 //                System.out.println("mouse is on a GUI thing!");
-                setMouseBehavior(new GuiMouse(this, buyStuffGuiElement));
+
+                // Ugh very ugly
+                if (!(mouseBehavior instanceof PlacingStructureMouse)) {
+                    setMouseBehavior(new GuiMouse(this, buyStuffGuiElement));
+                }
             } else {
 
                 if (this.mouseBehavior instanceof GuiMouse) {

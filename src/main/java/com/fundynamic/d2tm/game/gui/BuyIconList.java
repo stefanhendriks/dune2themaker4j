@@ -2,21 +2,42 @@ package com.fundynamic.d2tm.game.gui;
 
 
 import com.fundynamic.d2tm.game.behaviors.Renderable;
+import com.fundynamic.d2tm.game.behaviors.Updateable;
+import com.fundynamic.d2tm.game.controls.Mouse;
+import com.fundynamic.d2tm.game.controls.PlacingStructureMouse;
+import com.fundynamic.d2tm.game.entities.EntityRepository;
 import com.fundynamic.d2tm.game.rendering.RenderQueue;
-import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 
 import java.util.ArrayList;
 
-public class BuyIconList extends ArrayList<BuyIcon> implements Renderable {
+public class BuyIconList extends ArrayList<BuyIcon> implements Renderable, Updateable {
+
+    private Mouse mouse;
 
     private BuyIcon busyWithBuildingIcon;
 
-    public void buildActiveIcon() {
-        if (isBuildingIcon()) {
+    private EntityRepository entityRepository;
+
+    public BuyIconList(Mouse mouse, EntityRepository entityRepository) {
+        this.mouse = mouse;
+        this.entityRepository = entityRepository;
+    }
+
+    public void leftClicked() {
+        if (isBusyBuilding()) {
+            // clicked on the icon that is building things
+            if (busyWithBuildingIcon.isMouseHovers()) {
+                // for now place random thing
+                mouse.setMouseBehavior(new PlacingStructureMouse(mouse, entityRepository));
+
+                // TODO: When placed, mark as done
+                // TODO: Hide gui element
+            }
+
+            // to rightclicked thing?
             // TODO: check if hovering over the busyWithBuildingIcon
-            // and if so, we can cancel building, etc?
-            // or when it is finished building, we can get into 'place this thing mode' ?
+            // TODO: and if so, we can cancel building, etc?
             return;
         }
 
@@ -39,7 +60,7 @@ public class BuyIconList extends ArrayList<BuyIcon> implements Renderable {
         }
     }
 
-    public boolean isBuildingIcon() {
+    public boolean isBusyBuilding() {
         return busyWithBuildingIcon != null;
     }
 
@@ -67,6 +88,16 @@ public class BuyIconList extends ArrayList<BuyIcon> implements Renderable {
 
     @Override
     public void enrichRenderQueue(RenderQueue renderQueue) {
+        // nothing to do here
+    }
 
+    public void update(float deltaInSeconds) {
+        for (BuyIcon buyIcon : this) {
+            // tell it if the mouse is hovering over it or not
+            buyIcon.setMouseHovers(buyIcon.isVectorWithin(mouse.getPosition()));
+
+            // call its update method
+            buyIcon.update(deltaInSeconds);
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.fundynamic.d2tm.game.rendering;
 
 import com.fundynamic.d2tm.Game;
 import com.fundynamic.d2tm.game.behaviors.Renderable;
+import com.fundynamic.d2tm.game.behaviors.Updateable;
 import com.fundynamic.d2tm.game.controls.Mouse;
 import com.fundynamic.d2tm.game.entities.Entity;
 import com.fundynamic.d2tm.game.entities.EntityRepository;
@@ -16,7 +17,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-public class Viewport implements Renderable {
+public class Viewport implements Renderable, Updateable {
 
     private static final int PIXELS_NEAR_BORDER = 2;
 
@@ -136,14 +137,15 @@ public class Viewport implements Renderable {
         Rectangle rectangle = Rectangle.createWithDimensions(viewingVector.min(Vector2D.create(32, 32)), viewportDimensions.add(Vector2D.create(64, 64)));
 
         RenderQueue renderQueue = new RenderQueue(this.viewingVector);
+
         // This is an expensive operation!
         renderQueue.put(entityRepository.findEntitiesWithinRectangle(rectangle).toList());
 
         return renderQueue;
     }
 
+    @Override
     public void update(float delta) {
-
         // Move around the viewing vector
         Vector2D translation = velocity.scale(delta);
         // Make sure it won't go out of bounds
@@ -164,7 +166,7 @@ public class Viewport implements Renderable {
                if (lastSelectedEntity.isStructure()) {
                     // TODO: Make window pop-up next to structure?
                     Vector2D mousePosition = mouse.getPosition();
-                    buyStuffGuiElement = new BuyStuffGuiElement(mousePosition.getXAsInt() + 16, mousePosition.getYAsInt() - 16, mouse);
+                    buyStuffGuiElement = new BuyStuffGuiElement(mousePosition.getXAsInt() + 16, mousePosition.getYAsInt() - 16, mouse, mouse.getEntityRepository());
                 }
             }
         }

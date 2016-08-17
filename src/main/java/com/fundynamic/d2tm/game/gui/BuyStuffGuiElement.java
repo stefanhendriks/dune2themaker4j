@@ -3,6 +3,7 @@ package com.fundynamic.d2tm.game.gui;
 import com.fundynamic.d2tm.game.behaviors.Renderable;
 import com.fundynamic.d2tm.game.behaviors.Updateable;
 import com.fundynamic.d2tm.game.controls.Mouse;
+import com.fundynamic.d2tm.game.entities.EntityRepository;
 import com.fundynamic.d2tm.game.entities.Rectangle;
 import com.fundynamic.d2tm.game.rendering.RenderQueue;
 import com.fundynamic.d2tm.graphics.ImageRepository;
@@ -18,17 +19,25 @@ public class BuyStuffGuiElement implements Renderable, Updateable {
 
     private Rectangle rectangle;
 
-    private BuyIconList buyIconList = new BuyIconList();
+    private BuyIconList buyIconList;
 
     private final int widthOfIcon;
     private final int heightOfIcon;
 
     private Mouse mouse;
 
-    public BuyStuffGuiElement(int x, int y, Mouse mouse) {
+    public BuyStuffGuiElement(int x, int y, Mouse mouse, EntityRepository entityRepository) {
         this.mouse = mouse;
+        this.buyIconList = new BuyIconList(mouse, entityRepository);
+
         // TODO: Do this properly, because a getInstance is a very ugly way to get this dependency here.
         ImageRepository instance = ImageRepository.getInstance();
+
+        // TODO: Get this list of buying icons from an INI file, ie
+        // TODO: it depends on which structure you select what the list will be. So some sort of
+        // TODO: factory will most likely be the responsible class to build an object instead of this
+        // TODO: very big ugly constructor
+
         List<Image> images = new ArrayList<>();
         images.add(instance.loadAndCache("ui/icons/icon_1slab.bmp"));
         images.add(instance.loadAndCache("ui/icons/icon_4slab.bmp"));
@@ -153,14 +162,11 @@ public class BuyStuffGuiElement implements Renderable, Updateable {
 
     @Override
     public void update(float deltaInSeconds) {
-        for (BuyIcon buyIcon : buyIconList) {
-            buyIcon.setMouseHovers(buyIcon.isVectorWithin(mouse.getPosition()));
-            buyIcon.update(deltaInSeconds);
-        }
+        buyIconList.update(deltaInSeconds);
     }
 
     public void leftClicked() {
-        buyIconList.buildActiveIcon();
+        buyIconList.leftClicked();
     }
 
     public void rightClicked() {
