@@ -224,7 +224,7 @@ public class Mouse {
 
         Vector2D viewportPosition = viewport.translateScreenToViewportCoordinate(screenPosition);
         if (viewportPosition != null) {
-            BuyStuffGuiElement buyStuffGuiElement = viewport.isWithinBuyStuffGuyElement(screenPosition);
+            BuyStuffGuiElement buyStuffGuiElement = viewport.isWithinBuyStuffGuiElement(screenPosition);
             if (buyStuffGuiElement != null) {
                 // set mouse behaviour + remember the old one, so when we lose focus we get back to the old
                 // behavior?

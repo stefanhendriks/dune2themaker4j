@@ -21,7 +21,6 @@ public class GuiMouse extends AbstractMouseBehavior {
         if (buyStuffGuiElement.isVectorWithin(mouse.getPosition())) {
             buyStuffGuiElement.leftClicked();
         }
-
     }
 
     @Override

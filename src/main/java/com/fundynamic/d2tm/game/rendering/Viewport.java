@@ -249,7 +249,7 @@ public class Viewport implements Renderable {
         return new Coordinate(screenPosition.min(drawingVector));
     }
 
-    public BuyStuffGuiElement isWithinBuyStuffGuyElement(Vector2D screenPosition) {
+    public BuyStuffGuiElement isWithinBuyStuffGuiElement(Vector2D screenPosition) {
         if (buyStuffGuiElement != null) {
             if (buyStuffGuiElement.isVectorWithin(screenPosition)) {
                 return buyStuffGuiElement;
